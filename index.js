@@ -113,7 +113,7 @@ app.delete("/api/items/:item_name", (req,res) => {
 })
 
 // Update item
-app.put("/api/animals", (req,res) => {
+app.put("/api/items/:item_id", (req,res) => {
     console.log("This method will be implemented in the future");
     res.status(501).send("This method will be implemented in the future");
 })
