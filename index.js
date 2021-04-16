@@ -1,3 +1,7 @@
+// Written by Madhav Jaisankar
+// Student #: 991522670
+// PROG34104
+
 // ----------------------------------
 // MONGOOSE SETUP AND CONFIG
 // ----------------------------------
@@ -37,7 +41,7 @@ app.get("/api/items", (req, res) => {
     LItem.find().exec().then(
         (results) => {
             console.log(results)
-            res.send(results)
+            res.status(200).send(results)
         }
     ).catch(
         (err) => {
@@ -48,12 +52,77 @@ app.get("/api/items", (req, res) => {
 })
 
 // Get one item
+app.get("/api/items/:item_name", (req,res) => {
+    LItem.findOne({'item':req.params.item_name}).exec().then(
+      (result) => {
+          if(!result) {
+              throw new Error();
+          }
+          console.log(result)
+          res.status(200).send(result) }
+    ).catch(
+      (err) => {
+          console.log("Item not found")
+          res.status(404).send("Item not found")
+      }
+    )    
+})
+
 // Add item
+app.post("/api/items", (req, res) => {
+
+    console.log("Received new item")
+    console.log(req.body)
+
+    LItem.create(req.body).then(
+        (result) => {
+            console.log("Added to the database")
+            console.log(result)
+            // express
+            res.status(201).send("Succesfully added to the database!")
+        }
+    ).catch(
+        (err) => {
+            console.log(`Error`)
+            console.log(err)
+            const msg = {
+                statusCode:500,
+                msg: "Error adding to database."
+            }
+            res.status(500).send(msg);
+        }
+    )
+});
+
 // Delete item
+app.delete("/api/items/:item_name", (req,res) => {
+    LItem.findOneAndDelete({'item':req.params.item_name}).exec().then(
+        (deletedItem) => {
+            if(!deletedItem) {
+                throw new Error();
+            }
+            console.log("Item was deleted")
+            res.status(201).send("Specified Item was deleted.") }
+
+    ).catch(
+        (err) => {
+            console.log("Item was not found")
+            res.status(404).send("Requested item was not found") 
+        }
+    )
+})
+
 // Update item
-// Other endpoints
+app.put("/api/animals", (req,res) => {
+    console.log("This method will be implemented in the future");
+    res.status(501).send("This method will be implemented in the future");
+})
 
-
+// Other invalid endpoints
+app.get('*', (req,res) => {
+    console.log("This page is does not exist");
+    res.status(404).send("This page does not exist!");
+});
 
 
 // ----------------------------------
@@ -62,8 +131,6 @@ app.get("/api/items", (req, res) => {
 const onHttpStart = () => {
     console.log(`Server has started and is listening on port ${HTTP_PORT}`)
 }
-
-
 
 // ----------------------------------
 // CONNECT TO MONGODB DATABASE
